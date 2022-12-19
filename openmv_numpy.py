@@ -27,13 +27,7 @@ class array:
                 pass
         get_len(self.M)
         return tuple(shape)
-    @property
-    def T(self):
-        shape = self.shape
-        assert len(shape)==2
-        r, w = shape
-        B = array([[self[j][i] for j in range(r)] for i in range(w)])
-        return B
+
     def __add__(self, other):
         A_shape = self.shape
         B_shape = other.shape
@@ -57,6 +51,14 @@ class array:
             return sum([self[i][t] * other[t][j] for t in range(r_a)])
         # return array([[l(i, j) for j in range(w_b)] for i in range(r_a)])
         return array([[l(i, j) for j in range(w_b)] for i in range(r_a)])
+    
+    @property
+    def T(self):
+        shape = self.shape
+        assert len(shape)==2
+        r, w = shape
+        B = array([[self[j][i] for j in range(r)] for i in range(w)])
+        return B
     @staticmethod
     def A_yu(A, I, J):
         r = len(A[0])
