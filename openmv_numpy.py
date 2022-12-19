@@ -164,10 +164,6 @@ class array:
     #     return A_inv
     def __str__(self):
         return str(self.M)
-# class eye(array):
-#     def __init__(self,size,value=1):
-#         super(array,self).__init__()
-#         self.M = [[value if i==j else 0 for i in range(size)] for j in range(size)]
 def eye(size,value=1):
     M = [[value if i==j else 0 for i in range(size)] for j in range(size)]
     return array(M)
