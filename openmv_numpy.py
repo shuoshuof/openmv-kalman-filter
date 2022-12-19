@@ -83,7 +83,6 @@ class array:
         shape = self.shape
         assert len(shape) == 2 and shape[0] == shape[1], '非方阵'
         r, c = shape
-        # for row in range(r):
         m = [[self.M[i][j] for j in range(c)] for i in range(r)]
         ans=1
         for col in range(c):
