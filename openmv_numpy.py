@@ -46,7 +46,7 @@ class array:
         assert len(A_shape) == 2 and len(B_shape) == 2
         r_a, w_a = A_shape
         r_b, w_b = B_shape
-        assert w_a == r_b, 'æ— æ³•ç›¸ä¹˜'
+        assert w_a == r_b, 'ÎŞ·¨Ïà³Ë'
         def l(i, j):
             return sum([self[i][t] * other[t][j] for t in range(r_a)])
         # return array([[l(i, j) for j in range(w_b)] for i in range(r_a)])
@@ -71,8 +71,8 @@ class array:
                         row.append(A[i][j])
                 M.append(row)
         return array(M)
-    # def det(self):#é€’å½’å¤ªæ…¢ï¼Œå¼ƒç”¨
-    #     assert len(self.shape) == 2 and self.shape[0] == self.shape[1], 'éæ–¹é˜µ'
+    # def det(self):#µİ¹éÌ«Âı£¬ÆúÓÃ
+    #     assert len(self.shape) == 2 and self.shape[0] == self.shape[1], '·Ç·½Õó'
     #     if len(self) == 1:
     #         return self[0][0]
     #     ans = 0
@@ -83,7 +83,7 @@ class array:
     #     return ans
     def det(self):
         shape = self.shape
-        assert len(shape) == 2 and shape[0] == shape[1], 'éæ–¹é˜µ'
+        assert len(shape) == 2 and shape[0] == shape[1], '·Ç·½Õó'
         r, c = shape
         m = [[self.M[i][j] for j in range(c)] for i in range(r)]
         ans=1
@@ -100,7 +100,7 @@ class array:
                 temp = m[col]
                 m[col]=zhu_row
                 m[zhu_yuan_index] =temp
-                ans*=-1#äº’æ¢è¡Œåˆ—å¼ä¸¤è¡Œï¼Œéœ€è¦å˜å·
+                ans*=-1#»¥»»ĞĞÁĞÊ½Á½ĞĞ£¬ĞèÒª±äºÅ
             else:
                 m[col] = zhu_row
 
@@ -110,7 +110,7 @@ class array:
         return ans
     def inv(self):
         shape = self.shape
-        assert self.det()!=0,'æ–¹é˜µä¸å¯é€†'
+        assert self.det()!=0,'·½Õó²»¿ÉÄæ'
         r, c = shape
         # for row in range(r):
         m = [[self.M[i][j] for j in range(c)] for i in range(r)]
@@ -135,7 +135,7 @@ class array:
                 I[col] = I_zhu_row
                 I[zhu_yuan_index]=I_temp
 
-                ans*=-1#äº’æ¢è¡Œåˆ—å¼ä¸¤è¡Œï¼Œéœ€è¦å˜å·
+                ans*=-1#»¥»»ĞĞÁĞÊ½Á½ĞĞ£¬ĞèÒª±äºÅ
             else:
                 m[col] = zhu_row
                 I[col] = I_zhu_row
@@ -151,8 +151,8 @@ class array:
             # print(m)
         return array(I)
     # def inv(self):
-    #     assert len(self.shape) == 2 and self.shape[0] == self.shape[1], 'éæ–¹é˜µ'
-    #     assert self.det()!=0,'æ–¹é˜µä¸å¯é€†'
+    #     assert len(self.shape) == 2 and self.shape[0] == self.shape[1], '·Ç·½Õó'
+    #     assert self.det()!=0,'·½Õó²»¿ÉÄæ'
     #     A_star = []
     #     r, w = self.shape
     #     c = self.det()

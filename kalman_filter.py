@@ -5,10 +5,10 @@ class Tracker:
         self.H = H
         self.Q = Q
         self.R = R
-        self.P=np.eye(4)#è¯¯å·®åæ–¹å·®çŸ©é˜µ
+        self.P=np.eye(4)#Îó²îĞ­·½²î¾ØÕó
         self.active = 0 #
         self.lose_threshold = lose_threshold
-        self.updated=False #æ˜¯å¦åœ¨è¯¥å¸§å·²ç»æ›´æ–°äº†çš„æ ‡å¿—ä½
+        self.updated=False #ÊÇ·ñÔÚ¸ÃÖ¡ÒÑ¾­¸üĞÂÁËµÄ±êÖ¾Î»
         self.last_X_posterior=None
         self.last_position = [None,None]
         self.motion_trail_measure = []
@@ -37,16 +37,16 @@ class Tracker:
                                       [d_x / dt],
                                       [d_y / dt]])
 
-                # å…ˆéªŒ
+                # ÏÈÑé
                 self.A[0][2], self.A[1][3] = dt, dt
                 X_prior = self.A * self.last_X_posterior
-                # å…ˆéªŒè¯¯å·®åæ–¹å·®çŸ©é˜µ
+                # ÏÈÑéÎó²îĞ­·½²î¾ØÕó
                 P_k_prior = self.A * self.P * self.A.T + self.Q
-                # å¡å°”æ›¼å¢ç›Š
+                # ¿¨¶ûÂüÔöÒæ
                 K_k = (P_k_prior * self.H.T) * ((self.H * P_k_prior * self.H.T + self.R).inv())
-                # åéªŒä¼°è®¡
+                # ºóÑé¹À¼Æ
                 self.last_X_posterior = X_prior + K_k * (Z_measure - self.H * X_prior)
-                # æ›´æ–°è¯¯å·®åæ–¹å·®çŸ©é˜µ
+                # ¸üĞÂÎó²îĞ­·½²î¾ØÕó
                 self.P = (np.eye(4) - K_k * self.H) * P_k_prior
 
                 x_pre = int(self.last_X_posterior[0][0])
@@ -57,7 +57,7 @@ class Tracker:
                 return x_pre, y_pre
 
         else:
-            self.active-=1#å½“activeå€¼å†ä¸€æ¬¡ä¸º0æ—¶ï¼Œä¼šè¢«ç®¡ç†å™¨åˆ é™¤
+            self.active-=1#µ±activeÖµÔÙÒ»´ÎÎª0Ê±£¬»á±»¹ÜÀíÆ÷É¾³ı
             self.last_X_posterior = self.A*self.last_X_posterior
             x_pre = int(self.last_X_posterior[0][0])
             y_pre = int(self.last_X_posterior[1][0])
@@ -71,13 +71,13 @@ class Tracker:
         self.motion_trail_pre.append([int(x), int(y)])
         if len(self.motion_trail_pre) >= self.motion_trail_len:
             self.motion_trail_pre.pop(0)
-    def get_pre(self):#è·å¾—é¢„æµ‹å€¼ç”¨äºé…å¯¹ï¼Œä¸è¿›è¡Œæ›´æ–°
+    def get_pre(self):#»ñµÃÔ¤²âÖµÓÃÓÚÅä¶Ô£¬²»½øĞĞ¸üĞÂ
         pres = self.A*self.last_X_posterior
         return [int(pres[0][0]),int(pres[1][0])]
 class Tracker_Manager:
     def __init__(self,match_threshold=50):
         self.trackers =[]
-        self.match_threshold = match_threshold#åŒ¹é…è·ç¦»çš„é˜ˆå€¼
+        self.match_threshold = match_threshold#Æ¥Åä¾àÀëµÄãĞÖµ
         self.amount =0
     def __len__(self):
         return len(self.trackers)
@@ -93,27 +93,27 @@ class Tracker_Manager:
         else:
             min_dist = self.match_threshold+1
         if min_dist<=self.match_threshold:
-            self.trackers[dist.index(min_dist)](x,y,True)#æ›´æ–°åŒ¹é…æˆåŠŸçš„è¿½è¸ªå™¨
+            self.trackers[dist.index(min_dist)](x,y,True)#¸üĞÂÆ¥Åä³É¹¦µÄ×·×ÙÆ÷
         else:
-            print("åŒ¹é…å¤±è´¥")
+            print("Æ¥ÅäÊ§°Ü")
             self.amount+=1
-            new_trackers = Tracker(A,H,Q,R,self.amount,lose_threshold,motion_trail_len)#åŒ¹é…å¤±è´¥ï¼Œæ˜¯æ–°çš„ç›®æ ‡ï¼Œåˆ›å»ºæ–°çš„è¿½è¸ªå™¨
+            new_trackers = Tracker(A,H,Q,R,self.amount,lose_threshold,motion_trail_len)#Æ¥ÅäÊ§°Ü£¬ÊÇĞÂµÄÄ¿±ê£¬´´½¨ĞÂµÄ×·×ÙÆ÷
             new_trackers(x,y,True)
             self.append(new_trackers)
-    def update(self):#å¯¹è¯¥å¸§æœªæ£€æµ‹åˆ°çš„è¿½è¸ªå™¨è¿›è¡Œè¡Œæ›´æ–°
+    def update(self):#¶Ô¸ÃÖ¡Î´¼ì²âµ½µÄ×·×ÙÆ÷½øĞĞĞĞ¸üĞÂ
         delate_indexs = []
-        for i,tracker in enumerate(self.trackers):#æ›´æ–°æ²¡åŒ¹é…æˆåŠŸçš„è¿½è¸ªå™¨
+        for i,tracker in enumerate(self.trackers):#¸üĞÂÃ»Æ¥Åä³É¹¦µÄ×·×ÙÆ÷
             if tracker.updated:
                 tracker.updated=False
             else:
                 tracker(0,0,False)
-            if tracker.active==0:#æŸ¥æ‰¾å¤±æ•ˆè¿½è¸ªå™¨
+            if tracker.active==0:#²éÕÒÊ§Ğ§×·×ÙÆ÷
                 delate_indexs.append(i)
         del_num=0
-        for index in delate_indexs:#åˆ é™¤å¤±æ•ˆè¿½è¸ªå™¨
+        for index in delate_indexs:#É¾³ıÊ§Ğ§×·×ÙÆ÷
             self.trackers.pop(index - del_num)
             del_num += 1
-    def get_positions(self):#è·å–åéªŒåæ ‡
+    def get_positions(self):#»ñÈ¡ºóÑé×ø±ê
         positions =[]
         for tracker in self.trackers:
             x,y = tracker.last_X_posterior[0][0],tracker.last_X_posterior[1][0]
