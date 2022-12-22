@@ -4,11 +4,12 @@ class array:
     def __init__(self,M:list):
         self.M= M
         self.shape = self.get_shape()
+        self.ndim = len(self.shape)
     def __len__(self):
         return len(self.M)
     def __getitem__(self, *args):
         if isinstance(args[0],tuple):
-            assert len(args[0]) <= len(self.shape), 'out'
+            assert len(args[0]) <= self.ndim, 'out'
             indexs =list(args[0])
             def get_value(a,num):
                 if len(indexs)-1==num:
@@ -29,24 +30,18 @@ class array:
         return tuple(shape)
 
     def __add__(self, other):
-        A_shape = self.shape
-        B_shape = other.shape
-        assert len(A_shape) == 2 and len(B_shape) == 2 and A_shape == B_shape
-        r, w = A_shape
+        assert self.ndim == 2 and other.ndim == 2 and self.shape == other.shape
+        r, w = self.shape
         return array([[self[i][j] + other[i][j] for j in range(w)] for i in range(r)])
     def __sub__(self, other):
-        A_shape = self.shape
-        B_shape = other.shape
-        assert len(A_shape) == 2 and len(B_shape) == 2 and A_shape == B_shape
-        r, w = A_shape
+        assert self.ndim == 2 and other.ndim == 2 and self.shape == other.shape
+        r, w = self.shape
         return array([[self[i][j] - other[i][j] for j in range(w)] for i in range(r)])
     def __mul__(self, other):
-        A_shape = self.shape
-        B_shape = other.shape
-        assert len(A_shape) == 2 and len(B_shape) == 2
-        r_a, w_a = A_shape
-        r_b, w_b = B_shape
-        assert w_a == r_b, 'Œﬁ∑®œ‡≥À'
+        assert self.ndim == 2 and other.ndim == 2
+        r_a, w_a = self.shape
+        r_b, w_b = other.shape
+        assert w_a == r_b, 'Êó†Ê≥ïÁõ∏‰πò'
         def l(i, j):
             return sum([self[i][t] * other[t][j] for t in range(r_a)])
         # return array([[l(i, j) for j in range(w_b)] for i in range(r_a)])
@@ -54,11 +49,70 @@ class array:
     
     @property
     def T(self):
-        shape = self.shape
-        assert len(shape)==2
-        r, w = shape
+        assert self.ndim==2
+        r, w = self.shape
         B = array([[self[j][i] for j in range(r)] for i in range(w)])
         return B
+    def det(self):
+        shape = self.shape
+        assert self.ndim==2 and shape[0] == shape[1], 'ÈùûÊñπÈòµ'
+        r, c = shape
+        m = [[self.M[i][j] for j in range(c)] for i in range(r)]
+        ans=1
+        for col in range(c):
+            v = [math.fabs(row[col]) for row in m[col:]]
+            pivot = max(v)
+            if pivot==0:
+                return 0
+            pivot_index = v.index(pivot)+col
+            pivot = m[pivot_index][col]
+            pivot_row = [x / pivot for x in m[pivot_index]]
+            ans=ans*pivot
+            if pivot_index!=col:
+                temp = m[col]
+                m[col]=pivot_row
+                m[pivot_index] =temp
+                ans*=-1#‰∫íÊç¢Ë°åÂàóÂºè‰∏§Ë°åÔºåÈúÄË¶ÅÂèòÂè∑
+            else:
+                m[col] = pivot_row
+
+            for i in range(col+1,r):
+                k = m[i][col]
+                m[i] = [ m[i][j]-k*pivot_row[j] for j in range(c)]
+        return ans
+    def inv(self):
+        shape = self.shape
+        assert self.det()!=0,'ÊñπÈòµ‰∏çÂèØÈÄÜ'
+        r, c = shape
+        m = [[self.M[i][j] for j in range(c)] for i in range(r)]
+        I = [[1 if i==j else 0 for i in range(r)] for j in range(r)]
+        for col in range(c):
+            v = [math.fabs(row[col]) for row in m[col:]] #ÈÄâÂá∫‰ªéÁ¨¨colË°åÂºÄÂßãÁöÑÁ¨¨colÂàó
+            pivot = max(v)
+            if pivot==0:
+                return 0
+            pivot_index = v.index(pivot)+col
+            pivot = m[pivot_index][col]
+            pivot_row = [x/pivot for x in m[pivot_index]]
+            I_pivot_row = [x/pivot for x in I[pivot_index]]
+            if pivot_index!=col:#Ë°å‰∫íÊç¢
+                temp = m[col]
+                m[col]=pivot_row
+                m[pivot_index] =temp
+
+                I_temp = I[col]
+                I[col] = I_pivot_row
+                I[pivot_index]=I_temp
+            else:
+                m[col] = pivot_row
+                I[col] = I_pivot_row
+            for i in range(r):
+                if i!=col:
+                    k = m[i][col]
+                    #ÂØπÂ∫îË°åÁõ∏Âáè
+                    m[i] = [ m[i][j]-k*pivot_row[j] for j in range(c)]
+                    I[i] = [I[i][j]-k*I[col][j]for j in range(c)]
+        return array(I)
     @staticmethod
     def A_yu(A, I, J):
         r = len(A[0])
@@ -71,8 +125,8 @@ class array:
                         row.append(A[i][j])
                 M.append(row)
         return array(M)
-    # def det(self):#µ›πÈÃ´¬˝£¨∆˙”√
-    #     assert len(self.shape) == 2 and self.shape[0] == self.shape[1], '∑«∑Ω’Û'
+    # def det(self):#ÈÄíÂΩíÂ§™ÊÖ¢ÔºåÂºÉÁî®
+    #     assert len(self.shape) == 2 and self.shape[0] == self.shape[1], 'ÈùûÊñπÈòµ'
     #     if len(self) == 1:
     #         return self[0][0]
     #     ans = 0
@@ -81,78 +135,9 @@ class array:
     #         M = self.A_yu(self.M, 0, t)
     #         ans += (-1) ** (1 + t + 1) * self[0][t] * M.det()
     #     return ans
-    def det(self):
-        shape = self.shape
-        assert len(shape) == 2 and shape[0] == shape[1], '∑«∑Ω’Û'
-        r, c = shape
-        m = [[self.M[i][j] for j in range(c)] for i in range(r)]
-        ans=1
-        for col in range(c):
-            v = [math.fabs(row[col]) for row in m[col:]]
-            zhu_yuan = max(v)
-            if zhu_yuan==0:
-                return 0
-            zhu_yuan_index = v.index(zhu_yuan)+col
-            zhu_yuan = m[zhu_yuan_index][col]
-            zhu_row = [x / zhu_yuan for x in m[zhu_yuan_index]]
-            ans=ans*zhu_yuan
-            if zhu_yuan_index!=col:
-                temp = m[col]
-                m[col]=zhu_row
-                m[zhu_yuan_index] =temp
-                ans*=-1#ª•ªª––¡– Ω¡Ω––£¨–Ë“™±‰∫≈
-            else:
-                m[col] = zhu_row
-
-            for i in range(col+1,r):
-                k = m[i][col]
-                m[i] = [ m[i][j]-k*zhu_row[j] for j in range(c)]
-        return ans
-    def inv(self):
-        shape = self.shape
-        assert self.det()!=0,'∑Ω’Û≤ªø…ƒÊ'
-        r, c = shape
-        # for row in range(r):
-        m = [[self.M[i][j] for j in range(c)] for i in range(r)]
-        I = [[1 if i==j else 0 for i in range(r)] for j in range(r)]
-        ans=1
-        for col in range(c):
-            v = [math.fabs(row[col]) for row in m[col:]]
-            zhu_yuan = max(v)
-            if zhu_yuan==0:
-                return 0
-            zhu_yuan_index = v.index(zhu_yuan)+col
-            zhu_yuan = m[zhu_yuan_index][col]
-            zhu_row = [x / zhu_yuan for x in m[zhu_yuan_index]]
-            I_zhu_row = [x/zhu_yuan for x in I[zhu_yuan_index]]
-            ans=ans*zhu_yuan
-            if zhu_yuan_index!=col:
-                temp = m[col]
-                m[col]=zhu_row
-                m[zhu_yuan_index] =temp
-
-                I_temp = I[col]
-                I[col] = I_zhu_row
-                I[zhu_yuan_index]=I_temp
-
-                ans*=-1#ª•ªª––¡– Ω¡Ω––£¨–Ë“™±‰∫≈
-            else:
-                m[col] = zhu_row
-                I[col] = I_zhu_row
-            for i in range(r):
-                if i!=col:
-                    k = m[i][col]
-                    m[i] = [ m[i][j]-k*zhu_row[j] for j in range(c)]
-                    I[i] = [I[i][j]-k*I[col][j]for j in range(c)]
-            # for i in range(col+1,r):
-            #     k = m[i][col]
-            #     m[i] = [ m[i][j]-k*zhu_row[j] for j in range(c)]
-            #     I[i] = [I[i][j] - k * I[col][j] for j in range(c)]
-            # print(m)
-        return array(I)
     # def inv(self):
-    #     assert len(self.shape) == 2 and self.shape[0] == self.shape[1], '∑«∑Ω’Û'
-    #     assert self.det()!=0,'∑Ω’Û≤ªø…ƒÊ'
+    #     assert len(self.shape) == 2 and self.shape[0] == self.shape[1], 'ÈùûÊñπÈòµ'
+    #     assert self.det()!=0,'ÊñπÈòµ‰∏çÂèØÈÄÜ'
     #     A_star = []
     #     r, w = self.shape
     #     c = self.det()
@@ -165,6 +150,9 @@ class array:
     #     return A_inv
     def __str__(self):
         return str(self.M)
+
+
+       
 def eye(size,value=1):
     M = [[value if i==j else 0 for i in range(size)] for j in range(size)]
     return array(M)
@@ -187,20 +175,57 @@ def zeros(shape:tuple):
 def ones(shape:tuple):
     return full(shape,1)
 
+def solve(A:array,B:array)->array:
+    if A.det()==0:
+        raise ValueError("Êó†Ëß£")
+    assert B.ndim==2 and B.shape[0]==A.shape[0] and B.shape[1]==1
+    r, c = A.shape
+    m = [[A.M[i][j] for j in range(c)] for i in range(r)]
+    b = [[B.M[i][0]] for i in range(r)]
+    for col in range(c):
+        v = [math.fabs(row[col]) for row in m[col:]] #ÈÄâÂá∫‰ªéÁ¨¨colË°åÂºÄÂßãÁöÑÁ¨¨colÂàó
+        pivot = max(v)
+        if pivot==0:
+            return 0
+        pivot_index = v.index(pivot)+col
+        pivot = m[pivot_index][col]
+        pivot_row = [x/pivot for x in m[pivot_index]]
+        b_pivot_row = [x/pivot for x in b[pivot_index]]
+        if pivot_index!=col:#Ë°å‰∫íÊç¢
+            temp = m[col]
+            m[col]=pivot_row
+            m[pivot_index] =temp
+
+            b_temp = b[col]
+            b[col] = b_pivot_row
+            b[pivot_index]=b_temp
+
+        else:
+            m[col] = pivot_row
+            b[col] = b_pivot_row
+        for i in range(r):
+            if i!=col:
+                k = m[i][col]
+                #ÂØπÂ∫îË°åÁõ∏Âáè
+                m[i] = [ m[i][j]-k*pivot_row[j] for j in range(c)]
+                b[i] = [b[i][0]-k*b[col][0]]
+    return array(b)
+
+
 if __name__ =='__main__':
-    A = [[1,3],
-         [1,2]]
-    B = [[2,1],
-         [1,1]]
-    A0 = [[4,1,2,3],
-          [4,5,4,2],
-          [1,3,3,4],
-          [1,3,2,5]]
-    #
-    # print(ones((1,3)))
+    # A = [[1,3],
+    #      [1,2]]
+    # B = [[2,1],
+    #      [1,1]]
+    # A0 = [[4,1,2,3],
+    #       [4,5,4,2],
+    #       [1,3,3,4],
+    #       [1,3,2,5]]
+    # #
+    # # print(ones((1,3)))
     
-    A= array(A0)
-    print(A[0,0])
+    # A= array(A0)
+    # print(A[0,0])
 
     # t1 = time.clock()
     # print(A.inv())
@@ -212,3 +237,19 @@ if __name__ =='__main__':
     # print(np.linalg.inv(np.array(A0)))
     # t4=time.clock()
     # print(f"time:{t4-t3}")
+    A = [[12,-3,3],
+        [-18,3,-1],
+        [1,1,1]]
+    B = [[15],
+        [-15],
+        [6]]   
+    A = array(A)
+    B = array(B)
+
+    solve(A,B)
+    import numpy as np
+    
+    A = np.array(A)
+    B = np.array(B)
+    print(np.linalg.solve(A,B))
+    
