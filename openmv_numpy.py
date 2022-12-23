@@ -212,44 +212,4 @@ def solve(A:array,B:array)->array:
     return array(b)
 
 
-if __name__ =='__main__':
-    # A = [[1,3],
-    #      [1,2]]
-    # B = [[2,1],
-    #      [1,1]]
-    # A0 = [[4,1,2,3],
-    #       [4,5,4,2],
-    #       [1,3,3,4],
-    #       [1,3,2,5]]
-    # #
-    # # print(ones((1,3)))
-    
-    # A= array(A0)
-    # print(A[0,0])
-
-    # t1 = time.clock()
-    # print(A.inv())
-    # t2 = time.clock()
-    # print(f"time:{t2-t1}")
-    # #
-    # import numpy as np
-    # t3 = time.clock()
-    # print(np.linalg.inv(np.array(A0)))
-    # t4=time.clock()
-    # print(f"time:{t4-t3}")
-    A = [[12,-3,3],
-        [-18,3,-1],
-        [1,1,1]]
-    B = [[15],
-        [-15],
-        [6]]   
-    A = array(A)
-    B = array(B)
-
-    solve(A,B)
-    import numpy as np
-    
-    A = np.array(A)
-    B = np.array(B)
-    print(np.linalg.solve(A,B))
     
