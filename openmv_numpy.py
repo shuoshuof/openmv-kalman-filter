@@ -38,13 +38,14 @@ class array:
         r, w = self.shape
         return array([[self[i][j] - other[i][j] for j in range(w)] for i in range(r)])
     def __mul__(self, other):
+        if isinstance(other,(int,float)):
+            other = eye(self.shape[1],other)
         assert self.ndim == 2 and other.ndim == 2
         r_a, w_a = self.shape
         r_b, w_b = other.shape
         assert w_a == r_b, '无法相乘'
         def l(i, j):
-            return sum([self[i][t] * other[t][j] for t in range(r_a)])
-        # return array([[l(i, j) for j in range(w_b)] for i in range(r_a)])
+            return sum([self[i][t] * other[t][j] for t in range(w_a)])
         return array([[l(i, j) for j in range(w_b)] for i in range(r_a)])
     
     @property
@@ -175,6 +176,7 @@ def zeros(shape:tuple):
 def ones(shape:tuple):
     return full(shape,1)
 
+#解线性方程组
 def solve(A:array,B:array)->array:
     if A.det()==0:
         raise ValueError("无解")
@@ -211,5 +213,6 @@ def solve(A:array,B:array)->array:
                 b[i] = [b[i][0]-k*b[col][0]]
     return array(b)
 
+if __name__ == '__main__':
+    print("")
 
-    
