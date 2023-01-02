@@ -13,6 +13,19 @@ sensor.set_auto_exposure(True)
 
 yellow_rect=(0, 100, -54, 3, 6, 127)
 
+A = np.array([[1,0,1,0],
+              [0,1,0,1],
+              [0,0,1,0],
+              [0,0,0,1]])
+
+
+H_k = np.eye(4)
+
+Q = np.eye(4,value=0.1)
+
+R = np.eye(4)
+
+B=None
 
 Manager = Tracker_Manager()
 
@@ -32,6 +45,7 @@ while(True):
         position_x ,position_y = int(r.x()+r.w()/2),int(r.y()+r.h()/2)
         #print(position_x,position_y)
         img.draw_cross(position_x, position_y, color = (255, 0, 0), size = 10, thickness = 2)
+        #匹配
         Manager.match(position_x,position_y,A,H_k,Q,R)
     Manager.update()
     trails_pre = Manager.get_motion_trail_pre()

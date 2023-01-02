@@ -1,8 +1,7 @@
 import cv2
 import openmv_numpy as np
 import numpy as np1
-from kalman_filter import Tracker,Tracker_Manager
-import time
+from kalman_filter import Tracker_Manager
 import random
 import math
 A = np.array([[1,0,1,0],
@@ -30,7 +29,7 @@ def draw(x,y,pre):
 def draw_motion_trail(motion_trail,pre):
     for position in motion_trail:
         draw(position[0],position[1],pre)
-
+#轨迹
 class trail_creater:
     def __init__(self,px,py,r):
         self.px = px
@@ -43,6 +42,7 @@ class trail_creater:
         x = self.r*math.cos(theta)+self.px
         y = self.r*math.sin(theta)+self.py
         return int(x),int(y)
+#轨迹管理器
 class trail_creater_Manager:
     def __init__(self):
         self.creaters=[]
@@ -74,6 +74,9 @@ while True:
         if len(trail):
             cv2.putText(frame,str(ID),(trail[0][0],trail[0][1]),cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
         draw_motion_trail(trail,True)
+    # for ID,pos in Manager.get_positions():
+    #     x,y=pos
+    #     cv2.putText(frame,str(ID),(x,y),cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
     cv2.imshow("kalman_tracker", frame)
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):

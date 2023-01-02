@@ -8,7 +8,7 @@ class Tracker:
         self.R = R
         self.P=np.eye(4)#误差协方差矩阵
         self.active = 0 #
-        self.lose_threshold = lose_threshold
+        self.lose_threshold = lose_threshold#多少帧后认为目标丢失
         self.updated=False #是否在该帧已经更新了的标志位
         self.last_X_posterior=None
         self.last_position = [None,None]
@@ -118,7 +118,7 @@ class Tracker_Manager:
         positions =[]
         for tracker in self.trackers:
             x,y = tracker.last_X_posterior[0][0],tracker.last_X_posterior[1][0]
-            positions.append([int(x),int(y)])
+            positions.append((tracker.ID,[int(x),int(y)]))
         return positions
     def get_motion_trail_measure(self):
         return [(tracker.ID,tracker.motion_trail_measure) for tracker in self.trackers]
